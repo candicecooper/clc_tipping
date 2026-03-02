@@ -15,7 +15,10 @@ def init_supabase() -> Client:
     return create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
 supabase = init_supabase()
 
-ADMIN_PW = st.secrets.get("TIPPING_ADMIN_PASSWORD", "tipping2026")
+try:
+    ADMIN_PW = st.secrets["TIPPING_ADMIN_PASSWORD"]
+except Exception:
+    ADMIN_PW = "tipping2026"
 
 AFL_TEAMS = [
     "Adelaide","Brisbane Lions","Carlton","Collingwood","Essendon",
