@@ -76,16 +76,28 @@ def db_add_participant(name, afl_nick):
     ).execute()
 
 def db_get_staff_list():
-    return supabase.table("staff_list")        .select("id,name,email").eq("active", True).order("name").execute().data or []
+    try:
+        return supabase.table("staff_list")             .select("id,name,email").eq("active", True).order("name").execute().data or []
+    except Exception as e:
+        st.error(f"Could not load staff list: {e}")
+        return []
 
 def db_add_all_staff(staff_list, existing_names):
-    """Add all active staff not already in tipping_participants."""
+    """Add all active staff not already in tipping_participants, one at a time to avoid bulk insert errors."""
     to_add = [s for s in staff_list if s["name"] not in existing_names]
-    if to_add:
-        supabase.table("tipping_participants").insert(
-            [{"name": s["name"], "afl_nickname": ""} for s in to_add]
-        ).execute()
-    return len(to_add)
+    added = 0
+    errors = []
+    for s in to_add:
+        try:
+            supabase.table("tipping_participants").insert(
+                {"name": s["name"], "afl_nickname": ""}
+            ).execute()
+            added += 1
+        except Exception as e:
+            errors.append(f"{s['name']}: {e}")
+    if errors:
+        st.warning(f"Some staff could not be added: {'; '.join(errors[:3])}")
+    return added
 
 def db_del_participant(pid):
     supabase.table("tipping_scores").delete().eq("participant_id", pid).execute()
