@@ -72,6 +72,18 @@ def db_add_participant(name, afl_nick):
         {"name": name, "afl_nickname": afl_nick}
     ).execute()
 
+def db_get_staff_list():
+    return supabase.table("staff_list")        .select("id,name,email").eq("active", True).order("name").execute().data or []
+
+def db_add_all_staff(staff_list, existing_names):
+    """Add all active staff not already in tipping_participants."""
+    to_add = [s for s in staff_list if s["name"] not in existing_names]
+    if to_add:
+        supabase.table("tipping_participants").insert(
+            [{"name": s["name"], "afl_nickname": ""} for s in to_add]
+        ).execute()
+    return len(to_add)
+
 def db_del_participant(pid):
     supabase.table("tipping_scores").delete().eq("participant_id", pid).execute()
     supabase.table("tipping_participants").delete().eq("id", pid).execute()
@@ -217,6 +229,27 @@ if st.session_state.tipping_admin:
 
     # ── PARTICIPANTS ──
     with tab_p:
+        # ── Add all from staff list ──
+        staff_list_all = db_get_staff_list()
+        existing_names = {p["name"] for p in participants}
+        not_yet_added  = [s for s in staff_list_all if s["name"] not in existing_names]
+
+        if not_yet_added:
+            st.markdown(f"**Quick add from staff list** — {len(not_yet_added)} staff not yet in comp:")
+            preview = ", ".join(s["name"] for s in not_yet_added[:8])
+            if len(not_yet_added) > 8:
+                preview += f" +{len(not_yet_added)-8} more"
+            st.caption(preview)
+            if st.button(f"➕ Add all {len(not_yet_added)} staff to ladder", type="primary", use_container_width=True):
+                added = db_add_all_staff(staff_list_all, existing_names)
+                st.success(f"✅ Added {added} staff members!"); st.rerun()
+            st.markdown("---")
+        else:
+            st.success("✅ All active staff are already in the comp.")
+            st.markdown("---")
+
+        # ── Add individual ──
+        st.markdown("**Add individual staff member:**")
         with st.form("add_p", clear_on_submit=True):
             c1, c2, c3 = st.columns([3,3,1])
             with c1: pname = st.text_input("Staff name *")
@@ -232,8 +265,9 @@ if st.session_state.tipping_admin:
                 else:
                     st.warning("Name required")
 
+        # ── Current participants ──
         if participants:
-            st.markdown(f"**{len(participants)} participants:**")
+            st.markdown(f"**{len(participants)} participants currently in the comp:**")
             for p in participants:
                 pc1, pc2 = st.columns([6,1])
                 with pc1:
