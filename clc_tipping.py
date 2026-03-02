@@ -150,20 +150,21 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Admin toggle (sidebar)
-with st.sidebar:
-    st.markdown("### 🔐 Admin")
+# Admin toggle — shown inline at top right
+hcol1, hcol2 = st.columns([5, 2])
+with hcol2:
     if not st.session_state.tipping_admin:
-        pw = st.text_input("Password", type="password")
-        if st.button("Sign In", type="primary", use_container_width=True):
-            if pw == ADMIN_PW:
-                st.session_state.tipping_admin = True
-                st.rerun()
-            else:
-                st.error("Incorrect password")
+        with st.expander("🔐 Admin login"):
+            pw = st.text_input("Password", type="password", key="admin_pw")
+            if st.button("Sign In", type="primary", use_container_width=True):
+                if pw == ADMIN_PW:
+                    st.session_state.tipping_admin = True
+                    st.rerun()
+                else:
+                    st.error("Incorrect password")
     else:
         st.success("✅ Admin mode")
-        if st.button("Sign Out", use_container_width=True):
+        if st.button("🔓 Sign Out", use_container_width=True):
             st.session_state.tipping_admin = False
             st.rerun()
 
