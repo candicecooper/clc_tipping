@@ -351,10 +351,21 @@ if st.session_state.tipping_admin:
                     st.success(f"✅ Scores saved for {sel_round}!"); st.rerun()
 
 # ─── FOOTER ──────────────────────────────────────────────────────────────────
+st.markdown("---")
 st.markdown("""
-<div style="text-align:center;padding:2rem 0 0.5rem;color:#aaa;font-size:0.76rem;">
-  Cowandilla Learning Centre · Footy Tipping 2026 ·
-  <a href="https://tipping.afl.com.au/leagues" target="_blank"
-     style="color:#005EB8;text-decoration:none;">AFL Tipping Site ↗</a>
+<div style="text-align:center;padding:0.5rem 0 0.25rem;">
+  <a href="https://tipping.afl.com.au/leagues" target="_blank" rel="noopener"
+     style="display:inline-block;background:linear-gradient(135deg,#002B5C,#005EB8);
+            color:white;text-decoration:none;font-weight:700;font-size:1rem;
+            padding:0.85rem 2.5rem;border-radius:12px;
+            box-shadow:0 4px 14px rgba(0,43,92,0.35);
+            transition:box-shadow 0.2s;"
+     onmouseover="this.style.boxShadow='0 6px 20px rgba(0,43,92,0.5)'"
+     onmouseout="this.style.boxShadow='0 4px 14px rgba(0,43,92,0.35)'">
+    🏉 &nbsp; Enter Your Tips on AFL Tipping Site &nbsp; ↗
+  </a>
+</div>
+<div style="text-align:center;padding:0.75rem 0 0.5rem;color:#aaa;font-size:0.74rem;">
+  Cowandilla Learning Centre · Footy Tipping 2026
 </div>
 """, unsafe_allow_html=True)
