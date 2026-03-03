@@ -234,7 +234,7 @@ else:
             gold = pos == 0
             st.markdown(f"<div style='text-align:right;font-weight:800;font-size:1.05rem;color:{'#c8960c' if gold else '#005EB8'};padding:0.3rem 0;'>{row['total']}</div>", unsafe_allow_html=True)
 
-        st.divider() if pos < len(ladder)-1 else None
+        if pos < len(ladder)-1: st.divider()
 
 # ─── ADMIN PANEL ─────────────────────────────────────────────────────────────
 if st.session_state.tipping_admin:
